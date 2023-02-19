@@ -42,6 +42,7 @@ func Parse(fileName string) (Playlist, error) {
 			return Playlist{},
 				fmt.Errorf("unable to open playlist URL: %v", err)
 		}
+		data.Header.Set("User-Agent", "VLC Media Player")
 		f = data.Body
 	} else {
 		file, err := os.Open(fileName)
