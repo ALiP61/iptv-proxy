@@ -11,6 +11,7 @@ import (
 	"regexp"
 	"strconv"
 	"strings"
+	"time"
 )
 
 // Playlist is a type that represents an m3u playlist containing 0 or more tracks
@@ -49,7 +50,7 @@ func Parse(fileName string) (Playlist, error) {
 		
 		resp, err := c.Do(req)
 		if err != nil {
-			log.Fatal(err)
+			fmt.Errorof("unable to get provided m3u/m3u8", err)
 		}
 				
 		f = resp.Body
