@@ -36,14 +36,23 @@ type Track struct {
 func Parse(fileName string) (Playlist, error) {
 	var f io.ReadCloser
 
+	c := http.Client{Timeout: time.Duration(3) * time.Second}
+	req, err := http.NewRequest("GET", fileName, nil)
+	
 	if strings.HasPrefix(fileName, "http://") || strings.HasPrefix(fileName, "https://") {
-		data, err := http.Get(fileName)
+		
 		if err != nil {
 			return Playlist{},
 				fmt.Errorf("unable to open playlist URL: %v", err)
 		}
-		data.Header.Set("User-Agent", "VLC Media Player")
-		f = data.Body
+		req.Header.Add("User-Agent", "VLC")
+		
+		resp, err := c.Do(req)
+		if err != nil {
+			log.Fatal(err)
+		}
+				
+		f = resp.Body
 	} else {
 		file, err := os.Open(fileName)
 		if err != nil {
