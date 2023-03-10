@@ -72,8 +72,9 @@ func Parse(fileName string) (Playlist, error) {
 	for scanner.Scan() {
 		line := scanner.Text()
 		if onFirstLine && !strings.HasPrefix(line, "#EXTM3U") {
-			return Playlist{},
-				errors.New("invalid m3u file format. Expected #EXTM3U file header")
+			//return Playlist{},
+			//	errors.New("invalid m3u file format. Expected #EXTM3U file header")
+			continue
 		}
 
 		onFirstLine = false
