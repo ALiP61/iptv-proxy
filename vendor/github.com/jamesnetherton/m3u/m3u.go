@@ -11,7 +11,6 @@ import (
 	"regexp"
 	"strconv"
 	"strings"
-	"time"
 )
 
 // Playlist is a type that represents an m3u playlist containing 0 or more tracks
@@ -37,23 +36,13 @@ type Track struct {
 func Parse(fileName string) (Playlist, error) {
 	var f io.ReadCloser
 
-	c := http.Client{Timeout: time.Duration(3) * time.Second}
-	req, err := http.NewRequest("GET", fileName, nil)
-	
 	if strings.HasPrefix(fileName, "http://") || strings.HasPrefix(fileName, "https://") {
-		
+		data, err := http.Get(fileName)
 		if err != nil {
 			return Playlist{},
 				fmt.Errorf("unable to open playlist URL: %v", err)
 		}
-		req.Header.Add("User-Agent", "VLC")
-		
-		resp, err := c.Do(req)
-		if err != nil {
-			fmt.Errorf("unable to get provided m3u/m3u8", err)
-		}
-				
-		f = resp.Body
+		f = data.Body
 	} else {
 		file, err := os.Open(fileName)
 		if err != nil {
@@ -72,9 +61,8 @@ func Parse(fileName string) (Playlist, error) {
 	for scanner.Scan() {
 		line := scanner.Text()
 		if onFirstLine && !strings.HasPrefix(line, "#EXTM3U") {
-			//return Playlist{},
-			//	errors.New("invalid m3u file format. Expected #EXTM3U file header")
-			continue
+			return Playlist{},
+				errors.New("invalid m3u file format. Expected #EXTM3U file header")
 		}
 
 		onFirstLine = false
